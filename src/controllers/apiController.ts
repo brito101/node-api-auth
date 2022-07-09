@@ -36,27 +36,28 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-  if (req.body.email && req.body.password) {
-    let email: string = req.body.email
-    let password: string = req.body.password
+  res.json({ status: true })
+  // if (req.body.email && req.body.password) {
+  //   let email: string = req.body.email
+  //   let password: string = req.body.password
 
-    let user = await User.findOne({
-      where: { email, password },
-    })
+  //   let user = await User.findOne({
+  //     where: { email, password },
+  //   })
 
-    if (user) {
-      const token = JWT.sign(
-        { id: user.id, email: user.email },
-        process.env.JWT_SECRET_KEY as string,
-        { expiresIn: "2h" }
-      )
-      res.json({ status: true, token })
-      return
-    }
-  }
+  //   if (user) {
+  //     const token = JWT.sign(
+  //       { id: user.id, email: user.email },
+  //       process.env.JWT_SECRET_KEY as string,
+  //       { expiresIn: "2h" }
+  //     )
+  //     res.json({ status: true, token })
+  //     return
+  //   }
+  // }
 
-  res.json({ status: false })
-  return
+  // res.json({ status: false })
+  // return
 }
 
 export const list = async (req: Request, res: Response) => {

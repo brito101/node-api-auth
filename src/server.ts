@@ -3,6 +3,8 @@ import path from "path"
 import dotenv from "dotenv"
 import cors from "cors"
 import apiRoutes from "./routes/api"
+/** Passport Auth */
+import passport from "passport"
 
 dotenv.config()
 
@@ -12,6 +14,8 @@ server.use(cors())
 
 server.use(express.static(path.join(__dirname, "../public")))
 server.use(express.urlencoded({ extended: true }))
+
+server.use(passport.initialize())
 
 server.get("/ping", (req: Request, res: Response) => res.json({ pong: true }))
 
@@ -23,9 +27,14 @@ server.use((req: Request, res: Response) => {
 })
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  res.status(400) // Bad Request
+  if (err.status && err.message) {
+    res.status(err.status)
+    res.json({ error: err.message })
+  } else {
+    res.status(400) // Bad Request
+    res.json({ error: "Ocorreu algum erro." })
+  }
   console.log(err)
-  res.json({ error: "Ocorreu algum erro." })
 }
 server.use(errorHandler)
 
