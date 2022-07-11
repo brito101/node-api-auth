@@ -1,7 +1,8 @@
 import { Request, Response } from "express"
 import { User } from "../models/User"
-import JWT from "jsonwebtoken"
+// import JWT from "jsonwebtoken"
 import dotenv from "dotenv"
+import { generateToken } from "../config/passport"
 
 dotenv.config()
 
@@ -17,11 +18,12 @@ export const register = async (req: Request, res: Response) => {
     if (!hasUser) {
       let newUser = await User.create({ email, password })
 
-      const token = JWT.sign(
-        { id: newUser.id, email: newUser.email },
-        process.env.JWT_SECRET_KEY as string,
-        { expiresIn: "2h" }
-      )
+      // const token = JWT.sign(
+      //   { id: newUser.id, email: newUser.email },
+      //   process.env.JWT_SECRET_KEY as string,
+      //   { expiresIn: "2h" }
+      // )
+      const token = generateToken({ id: newUser.id })
       res.status(201)
       res.json({ id: newUser.id, token })
       return
@@ -36,28 +38,27 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-  res.json({ status: true })
-  // if (req.body.email && req.body.password) {
-  //   let email: string = req.body.email
-  //   let password: string = req.body.password
-
-  //   let user = await User.findOne({
-  //     where: { email, password },
-  //   })
-
-  //   if (user) {
-  //     const token = JWT.sign(
-  //       { id: user.id, email: user.email },
-  //       process.env.JWT_SECRET_KEY as string,
-  //       { expiresIn: "2h" }
-  //     )
-  //     res.json({ status: true, token })
-  //     return
-  //   }
-  // }
-
-  // res.json({ status: false })
-  // return
+  /** Basic Auth */
+  // res.json({ status: true })
+  if (req.body.email && req.body.password) {
+    let email: string = req.body.email
+    let password: string = req.body.password
+    let user = await User.findOne({
+      where: { email, password },
+    })
+    if (user) {
+      const token = generateToken({ id: user.id })
+      // const token = JWT.sign(
+      //   { id: user.id, email: user.email },
+      //   process.env.JWT_SECRET_KEY as string,
+      //   { expiresIn: "2h" }
+      // )
+      res.json({ status: true, token })
+      return
+    }
+  }
+  res.json({ status: false })
+  return
 }
 
 export const list = async (req: Request, res: Response) => {
